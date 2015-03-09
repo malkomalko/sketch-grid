@@ -1,9 +1,11 @@
 var _ = {};
+var ui = {};
 
 #import 'library/tim.js'
 #import 'library/json.js'
 #import 'library/db.js'
 #import 'library/functional.js'
+#import 'library/ui.js'
 #import 'library/classes.js'
 
 var noop = function () {};
@@ -34,31 +36,5 @@ var console = {
   },
   log: function (msg) {
     log(msg);
-  }
-};
-
-var ui = {
-  alert: function (msg, title) {
-    title = title || '';
-    var app = [NSApplication sharedApplication];
-    [app displayDialog:msg withTitle:title];
-  },
-  createMenu: function (message, items, selectedItemIndex) {
-    selectedItemIndex = selectedItemIndex || 0;
-
-    var accessory = [[NSComboBox alloc] initWithFrame:NSMakeRect(0,0,200,25)];
-    [accessory addItemsWithObjectValues:items];
-    [accessory selectItemAtIndex:selectedItemIndex];
-
-    var alert = [[NSAlert alloc] init];
-    [alert setMessageText:message];
-    [alert addButtonWithTitle:'OK'];
-    [alert addButtonWithTitle:'Cancel'];
-    [alert setAccessoryView:accessory];
-
-    var responseCode = [alert runModal];
-    var sel = [accessory indexOfSelectedItem];
-
-    return [responseCode, sel];
   }
 };
