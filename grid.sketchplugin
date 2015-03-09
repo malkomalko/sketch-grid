@@ -1,0 +1,113 @@
+appName = 'sketch-grid';
+
+var groupName = 'sketch-grid';
+var inputKey = 'lastInput';
+
+#import 'library/common.js'
+
+function selectionIsNotArtboard(selection) {
+  return selection.length() != 1 || selection[0].class() != MSArtboardGroup;
+}
+
+function removeGrid(artboard) {
+  var layer = _.find(artboard.layers(), function (layer) {
+    return layer.name() == groupName;
+  });
+  artboard.removeLayer(layer);
+}
+
+function selectionIsValid() {
+  if (selectionIsNotArtboard(selection)) {
+    [doc showMessage:'Please choose only one artboard'];
+    return false;
+  } else {
+    [doc showMessage:'Artboard selected'];
+    return true;
+  }
+}
+
+function frame(layer) {
+  var l = layer.frame();
+  return { width: l.width(), height: l.height(), x: l.x(), y: l.y() };
+}
+
+function askForInput() {
+  var defaultInput = {
+    margin: {l: 10, r: 10, t: 70, b: 10},
+    cols: {num: 12, gutter: 10},
+    rows: {num: 18, gutter: 10}
+  };
+  var lastInput = _.db.get(inputKey);
+  var initial = _.json.stringify(lastInput ? lastInput : defaultInput);
+  var opts = [doc askForUserInput:'Input grid options' initialValue:initial];
+
+  return opts ? _.json.parse(opts) : null;
+}
+
+function drawGrid(artboard, input) {
+  removeGrid(artboard);
+
+  var coords = gridCoords(frame(artboard), input);
+  var rects = [];
+
+  for (var c = 0; c < input.cols.num; c++) {
+    for (var r = 0; r < input.rows.num; r++) {
+      rects.push(drawRectangle(c, r, coords));
+    }
+  }
+
+  var group = MSLayerGroup.alloc().init();
+  var grid = coords.grid;
+  var rect = NSMakeRect(grid.l, grid.t, grid.width, grid.height);
+  group.frame = MSRect.rectWithRect(rect);
+  group.name = groupName;
+  group.isLocked = true;
+  group.addLayers(rects);
+
+  artboard.addLayers([group]);
+}
+
+function drawRectangle(col, row, coords) {
+  var shape = MSRectangleShape.alloc().init();
+  var group = shape.embedInShapeGroup();
+  var x = col * coords.cell.widthWithMargin;
+  var y = row * coords.cell.heightWithMargin;
+  var w = coords.cell.width;
+  var h = coords.cell.height;
+  group.frame = MSRect.rectWithRect(NSMakeRect(x, y, w, h));
+  shape.frame = MSRect.rectWithRect(NSMakeRect(0, 0, w, h));
+
+  var fill = group.style().fills().addNewStylePart();
+  fill.color = MSColor.colorWithSVGString('#FDF0F0');
+
+  return group;
+}
+
+function gridCoords(coords, input) {
+  var cols = input.cols;
+  var rows = input.rows;
+  var grid = {
+    height: coords.height - input.margin.t - input.margin.b,
+    width: coords.width - input.margin.l - input.margin.r,
+    t: input.margin.t,
+    l: input.margin.l
+  };
+  var cell = {
+    height: (grid.height - ((rows.num - 1 ) * rows.gutter)) / rows.num,
+    width: (grid.width - ((cols.num - 1 ) * cols.gutter)) / cols.num
+  };
+  cell.heightWithMargin = cell.height + rows.gutter;
+  cell.widthWithMargin = cell.width + cols.gutter;
+  return {grid: grid, cell: cell};
+}
+
+function main() {
+  if (!selectionIsValid()) return;
+  var input = askForInput();
+  if (input) {
+    _.db.set(inputKey, input);
+    drawGrid(selection[0], input);
+  }
+}
+
+main()
