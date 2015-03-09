@@ -1,3 +1,5 @@
+// (shift control g)
+
 appName = 'sketch-grid';
 
 var groupName = 'sketch-grid';
