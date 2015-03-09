@@ -2,6 +2,10 @@
 
 appName = 'sketch-grid';
 
+pluginPath = sketch.scriptPath.substring(0, sketch.scriptPath.lastIndexOf("/"));
+page = doc.currentPage();
+canvas = page.currentArtboard() ? page.currentArtboard() : page;
+
 var groupName = 'sketch-grid';
 var inputKey = 'lastInput';
 
@@ -41,9 +45,19 @@ function askForInput() {
   };
   var lastInput = _.db.get(inputKey);
   var initial = _.json.stringify(lastInput ? lastInput : defaultInput);
-  var opts = [doc askForUserInput:'Input grid options' initialValue:initial];
 
-  return opts ? _.json.parse(opts) : null;
+  var msg = 'Set margins and row/column information';
+  var response = ui.createTextField(msg, 'Make grid', initial);
+
+  if (response[0]) {
+    try {
+      return _.json.parse(response[1]);
+    } catch(err) {
+      return null;
+    }
+  } else {
+    return null;
+  }
 }
 
 function drawGrid(artboard, input) {
