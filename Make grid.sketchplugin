@@ -91,19 +91,47 @@ function drawGrid(artboard, input) {
 }
 
 function drawRectangle(col, row, coords) {
-  var shape = MSRectangleShape.alloc().init();
-  var group = shape.embedInShapeGroup();
+  var chr = String.fromCharCode(97 + col);
+  var group = MSLayerGroup.alloc().init();
+  group.name = chr + row;
+
+  var rect = MSRectangleShape.alloc().init();
+  var subGroup = rect.embedInShapeGroup();
+
   var x = col * coords.cell.widthWithMargin;
   var y = row * coords.cell.heightWithMargin;
   var w = coords.cell.width;
   var h = coords.cell.height;
-  group.frame = MSRect.rectWithRect(NSMakeRect(x, y, w, h));
-  shape.frame = MSRect.rectWithRect(NSMakeRect(0, 0, w, h));
 
-  var fill = group.style().fills().addNewStylePart();
+  subGroup.frame = MSRect.rectWithRect(NSMakeRect(x, y, w, h));
+  rect.frame = MSRect.rectWithRect(NSMakeRect(0, 0, w, h));
+
+  var fill = subGroup.style().fills().addNewStylePart();
   fill.color = MSColor.colorWithSVGString('#FDF0F0');
 
+  group.addLayers([subGroup]);
+
+  var text = drawText(group, chr + row);
+  text.frame().midX = subGroup.frame().midX();
+  text.frame().midY = subGroup.frame().midY();
+
+  group.resizeRoot(true);
+
   return group;
+}
+
+function drawText(group, text, color) {
+  color = color || '#333333';
+
+  var shape = group.addLayerOfType('text');
+  shape.name = text;
+  shape.stringValue = text;
+  shape.fontSize = 18;
+  shape.fontPostscriptName = 'Helvetica Neue Light';
+  shape.textColor = MSColor.colorWithSVGString(color);
+  shape.adjustFrameToFit();
+
+  return shape;
 }
 
 function gridCoords(coords, input) {
