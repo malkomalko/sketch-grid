@@ -37,17 +37,24 @@ function frame(layer) {
   return { width: l.width(), height: l.height(), x: l.x(), y: l.y() };
 }
 
-function askForInput() {
-  var defaultInput = {
-    margin: {l: 10, r: 10, t: 70, b: 10},
-    cols: {num: 12, gutter: 10},
-    rows: {num: 18, gutter: 10}
-  };
-  var lastInput = _.db.get(inputKey);
-  var initial = _.json.stringify(lastInput ? lastInput : defaultInput);
+function gridInput(lastInput) {
+  lastInput = lastInput || {};
+  return "{"
+    + '\n  "marginLeft": ' + (lastInput.marginLeft || 10) + ','
+    + '\n  "marginRight": ' + (lastInput.marginRight || 10) + ','
+    + '\n  "marginTop": ' + (lastInput.marginTop || 70) + ','
+    + '\n  "marginBottom": ' + (lastInput.marginBottom || 10) + ','
+    + '\n  "cols": ' + (lastInput.cols || 12) + ','
+    + '\n  "colsGutter": ' + (lastInput.colsGutter || 10) + ','
+    + '\n  "rows": ' + (lastInput.rows || 18) + ','
+    + '\n  "rowsGutter": ' + (lastInput.rowsGutter || 10)
+    + "\n}"
+}
 
+function askForInput() {
+  var lastInput = _.db.get(inputKey);
   var msg = 'Set margins and row/column information';
-  var response = ui.createTextField(msg, 'Make grid', initial);
+  var response = ui.createTextField(msg, 'Make grid', gridInput(lastInput));
 
   if (response[0]) {
     try {
@@ -66,8 +73,8 @@ function drawGrid(artboard, input) {
   var coords = gridCoords(frame(artboard), input);
   var rects = [];
 
-  for (var c = 0; c < input.cols.num; c++) {
-    for (var r = 0; r < input.rows.num; r++) {
+  for (var c = 0; c < input.cols; c++) {
+    for (var r = 0; r < input.rows; r++) {
       rects.push(drawRectangle(c, r, coords));
     }
   }
@@ -100,20 +107,18 @@ function drawRectangle(col, row, coords) {
 }
 
 function gridCoords(coords, input) {
-  var cols = input.cols;
-  var rows = input.rows;
   var grid = {
-    height: coords.height - input.margin.t - input.margin.b,
-    width: coords.width - input.margin.l - input.margin.r,
-    t: input.margin.t,
-    l: input.margin.l
+    height: coords.height - input.marginTop - input.marginBottom,
+    width: coords.width - input.marginLeft - input.marginRight,
+    t: input.marginTop,
+    l: input.marginLeft
   };
   var cell = {
-    height: (grid.height - ((rows.num - 1 ) * rows.gutter)) / rows.num,
-    width: (grid.width - ((cols.num - 1 ) * cols.gutter)) / cols.num
+    height: (grid.height - ((input.rows - 1) * input.rowsGutter)) / input.rows,
+    width: (grid.width - ((input.cols - 1) * input.colsGutter)) / input.cols
   };
-  cell.heightWithMargin = cell.height + rows.gutter;
-  cell.widthWithMargin = cell.width + cols.gutter;
+  cell.heightWithMargin = cell.height + input.rowsGutter;
+  cell.widthWithMargin = cell.width + input.colsGutter;
   return {grid: grid, cell: cell};
 }
 

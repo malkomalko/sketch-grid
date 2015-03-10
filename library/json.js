@@ -7,6 +7,6 @@ _.json.parse = function (jsonStr) {
 };
 
 _.json.stringify = function (obj) {
-  var data = NSJSONSerialization.dataWithJSONObject_options_error(obj, 0, null);
+  var data = NSJSONSerialization.dataWithJSONObject_options_error(obj, 1, null);
   return NSString.alloc().initWithData_encoding(data, NSUTF8StringEncoding);
 };

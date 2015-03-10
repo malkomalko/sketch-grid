@@ -37,7 +37,7 @@ ui.alert = function (msg, title) {
 ui.createMenu = function (message, items, selectedItemIndex) {
   selectedItemIndex = selectedItemIndex || 0;
 
-  var accessory = [[NSComboBox alloc] initWithFrame:NSMakeRect(0,0,200,25)];
+  var accessory = [[NSComboBox alloc] initWithFrame:NSMakeRect(0, 0, 200, 25)];
   [accessory addItemsWithObjectValues:items];
   [accessory selectItemAtIndex:selectedItemIndex];
 
@@ -50,9 +50,8 @@ ui.createMenu = function (message, items, selectedItemIndex) {
 ui.createTextField = function (message, title, initial) {
   initial = initial || '';
 
-  var accessory = NSTextField.alloc().initWithFrame(NSMakeRect(0, 0, 250, 150));
+  var accessory = NSTextField.alloc().initWithFrame(NSMakeRect(0, 0, 300, 200));
   accessory.setFont(NSFont.fontWithName_size('Monaco', 12));
-  accessory.enablesReturnKeyAutomatically = false;
   accessory.stringValue = initial;
 
   var modal = alertWindow(message, title, true, [accessory]);
