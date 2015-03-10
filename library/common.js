@@ -33,6 +33,10 @@ var console = {
     _.logMethods(obj, 'instanceMethodsWithAncestors');
     _.logMethods(obj, 'propertiesWithAncestors');
     _.logMethods(obj, 'protocolsWithAncestors');
+    _.logMethods(obj, 'classMethods');
+    _.logMethods(obj, 'instanceMethods');
+    _.logMethods(obj, 'properties');
+    _.logMethods(obj, 'protocols');
   },
   log: function (msg) {
     log(msg);
