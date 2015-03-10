@@ -126,8 +126,8 @@ function drawText(group, text, color) {
   var shape = group.addLayerOfType('text');
   shape.name = text;
   shape.stringValue = text;
-  shape.fontSize = 18;
-  shape.fontPostscriptName = 'Helvetica Neue Light';
+  shape.fontSize = 8;
+  shape.fontPostscriptName = 'Helvetica Neue';
   shape.textColor = MSColor.colorWithSVGString(color);
   shape.adjustFrameToFit();
 
